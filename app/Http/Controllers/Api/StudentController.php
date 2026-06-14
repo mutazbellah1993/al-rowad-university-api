@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
+use App\Http\Resources\AvailableCourseOfferingResource;
 use App\Http\Resources\StudentAcademicInfoResource;
 use App\Http\Resources\StudentCourseRegistrationResource;
 use App\Http\Resources\StudentDocumentResource;
 use App\Http\Resources\StudentProfileResource;
 use App\Http\Resources\StudentResource;
+use App\Http\Resources\StudentRegistrationSummaryResource;
 use App\Http\Resources\StudentTranscriptResource;
 use App\Models\Student;
+use App\Services\RegistrationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -129,6 +132,58 @@ class StudentController extends ApiController
 
         return $this->successResponse(
             (new StudentTranscriptResource($student))->resolve(request())
+        );
+    }
+
+    public function availableCourses(Student $student, Request $request, RegistrationService $service): JsonResponse
+    {
+        $validated = $request->validate([
+            'academic_year_id' => ['sometimes', 'integer', 'exists:academic_years,academic_year_id'],
+            'semester_id' => ['sometimes', 'integer', 'exists:semesters,semester_id'],
+        ]);
+
+        $offerings = $service->getAvailableCourses(
+            $student,
+            $validated['academic_year_id'] ?? null,
+            $validated['semester_id'] ?? null
+        );
+
+        return $this->successResponse(
+            AvailableCourseOfferingResource::collection($offerings)->resolve($request)
+        );
+    }
+
+    public function registeredHours(Student $student, Request $request, RegistrationService $service): JsonResponse
+    {
+        $validated = $request->validate([
+            'academic_year_id' => ['required', 'integer', 'exists:academic_years,academic_year_id'],
+            'semester_id' => ['required', 'integer', 'exists:semesters,semester_id'],
+        ]);
+
+        return $this->successResponse(
+            $service->getRegisteredHours(
+                $student,
+                (int) $validated['academic_year_id'],
+                (int) $validated['semester_id']
+            )
+        );
+    }
+
+    public function registrationSummary(Student $student, Request $request, RegistrationService $service): JsonResponse
+    {
+        $validated = $request->validate([
+            'academic_year_id' => ['sometimes', 'integer', 'exists:academic_years,academic_year_id'],
+            'semester_id' => ['sometimes', 'integer', 'exists:semesters,semester_id'],
+        ]);
+
+        $summary = $service->getRegistrationSummary(
+            $student,
+            $validated['academic_year_id'] ?? null,
+            $validated['semester_id'] ?? null
+        );
+
+        return $this->successResponse(
+            (new StudentRegistrationSummaryResource($summary))->resolve($request)
         );
     }
 }

@@ -129,6 +129,9 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('semesters/active', [SemesterController::class, 'active']);
 
     Route::get('students/search', [StudentController::class, 'search']);
+    Route::get('students/{student}/available-courses', [StudentController::class, 'availableCourses']);
+    Route::get('students/{student}/registered-hours', [StudentController::class, 'registeredHours']);
+    Route::get('students/{student}/registration-summary', [StudentController::class, 'registrationSummary']);
     Route::get('students/{student}/profile', [StudentController::class, 'profile']);
     Route::get('students/{student}/academic-info', [StudentController::class, 'academicInfo']);
     Route::get('students/{student}/documents', [StudentController::class, 'documents']);
@@ -154,6 +157,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('course-offerings/{id}/capacity', [CourseOfferingController::class, 'capacity']);
     Route::get('course-offerings/by-semester', [CourseOfferingController::class, 'bySemester']);
     Route::get('course-offerings/by-program/{program_id}', [CourseOfferingController::class, 'byProgram']);
+
+    Route::post('registrations/register-student', [RegistrationController::class, 'registerStudent']);
+    Route::post('registrations/{id}/drop', [RegistrationController::class, 'drop']);
+    Route::post('registrations/{id}/withdraw', [RegistrationController::class, 'withdraw']);
 
     Route::apiResource('academic-levels', AcademicLevelController::class);
     Route::apiResource('academic-programs', AcademicProgramController::class);
