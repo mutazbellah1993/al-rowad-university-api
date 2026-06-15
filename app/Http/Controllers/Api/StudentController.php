@@ -13,6 +13,7 @@ use App\Http\Resources\StudentResource;
 use App\Http\Resources\StudentRegistrationSummaryResource;
 use App\Http\Resources\StudentTranscriptResource;
 use App\Models\Student;
+use App\Services\AttendanceService;
 use App\Services\GradeService;
 use App\Services\RegistrationService;
 use Illuminate\Http\JsonResponse;
@@ -142,6 +143,35 @@ class StudentController extends ApiController
     public function cgpa(Student $student, GradeService $gradeService): JsonResponse
     {
         return $this->successResponse($gradeService->calculateCgpa($student));
+    }
+
+    public function attendance(Student $student, Request $request, AttendanceService $service): JsonResponse
+    {
+        $validated = $request->validate([
+            'academic_year_id' => ['sometimes', 'integer', 'exists:academic_years,academic_year_id'],
+            'semester_id' => ['sometimes', 'integer', 'exists:semesters,semester_id'],
+            'course_offering_id' => ['sometimes', 'integer', 'exists:course_offerings,course_offering_id'],
+        ]);
+
+        return $this->successResponse(
+            $service->getStudentAttendance(
+                $student,
+                $validated['academic_year_id'] ?? null,
+                $validated['semester_id'] ?? null,
+                $validated['course_offering_id'] ?? null
+            )
+        );
+    }
+
+    public function absencePercentage(Student $student, Request $request, AttendanceService $service): JsonResponse
+    {
+        $validated = $request->validate([
+            'course_offering_id' => ['required', 'integer', 'exists:course_offerings,course_offering_id'],
+        ]);
+
+        return $this->successResponse(
+            $service->getStudentAbsencePercentage($student, (int) $validated['course_offering_id'])
+        );
     }
 
     public function availableCourses(Student $student, Request $request, RegistrationService $service): JsonResponse

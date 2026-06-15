@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\CourseOffering\StoreCourseOfferingRequest;
 use App\Http\Requests\CourseOffering\UpdateCourseOfferingRequest;
+use App\Http\Requests\Attendance\StoreCourseOfferingAttendanceSessionRequest;
 use App\Http\Resources\CourseOfferingResource;
 use App\Http\Resources\CourseOfferingStudentResource;
 use App\Http\Resources\StudentCourseRegistrationResource;
 use App\Models\CourseOffering;
+use App\Services\AttendanceService;
 use App\Services\GradeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -141,5 +143,33 @@ class CourseOfferingController extends ApiController
     public function resultsSummary(int $id, GradeService $service): JsonResponse
     {
         return $this->successResponse($service->getResultsSummary($id));
+    }
+
+    public function attendanceSessions(int $id, AttendanceService $service): JsonResponse
+    {
+        return $this->successResponse($service->getCourseOfferingSessions($id));
+    }
+
+    public function storeAttendanceSession(int $id, StoreCourseOfferingAttendanceSessionRequest $request, AttendanceService $service): JsonResponse
+    {
+        $session = $service->createCourseOfferingSession(
+            $id,
+            $request->validated(),
+            (int) $request->user()->user_id
+        );
+
+        return $this->successResponse($session, 'Attendance session created successfully', 201);
+    }
+
+    public function deprivedStudents(int $id, AttendanceService $service): JsonResponse
+    {
+        return $this->successResponse($service->getDeprivedStudents($id));
+    }
+
+    public function applyDeprivation(int $id, AttendanceService $service): JsonResponse
+    {
+        $result = $service->applyDeprivation($id, request()->user()?->user_id);
+
+        return $this->successResponse($result, 'Deprivation applied successfully');
     }
 }

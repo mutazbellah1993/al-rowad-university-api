@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\AdmissionApplicationController;
 use App\Http\Controllers\Api\AppealStatusController;
 use App\Http\Controllers\Api\ApplicantController;
 use App\Http\Controllers\Api\ApprovalStatusController;
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AttendanceSessionController;
 use App\Http\Controllers\Api\AttendanceStatusController;
 use App\Http\Controllers\Api\BoardController;
@@ -140,6 +141,8 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('students/{student}/transcript', [StudentController::class, 'transcript']);
     Route::get('students/{student}/gpa', [StudentController::class, 'gpa']);
     Route::get('students/{student}/cgpa', [StudentController::class, 'cgpa']);
+    Route::get('students/{student}/attendance', [StudentController::class, 'attendance']);
+    Route::get('students/{student}/absence-percentage', [StudentController::class, 'absencePercentage']);
 
     Route::get('colleges/{college}/departments', [CollegeController::class, 'departments']);
     Route::get('departments/{department}/programs', [DepartmentController::class, 'programs']);
@@ -161,7 +164,14 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('course-offerings/by-semester', [CourseOfferingController::class, 'bySemester']);
     Route::get('course-offerings/{id}/grade-sheet', [CourseOfferingController::class, 'gradeSheet']);
     Route::get('course-offerings/{id}/results-summary', [CourseOfferingController::class, 'resultsSummary']);
+    Route::get('course-offerings/{id}/attendance-sessions', [CourseOfferingController::class, 'attendanceSessions']);
+    Route::post('course-offerings/{id}/attendance-sessions', [CourseOfferingController::class, 'storeAttendanceSession']);
+    Route::get('course-offerings/{id}/deprived-students', [CourseOfferingController::class, 'deprivedStudents']);
+    Route::post('course-offerings/{id}/apply-deprivation', [CourseOfferingController::class, 'applyDeprivation']);
     Route::get('course-offerings/by-program/{program_id}', [CourseOfferingController::class, 'byProgram']);
+
+    Route::get('attendance-sessions/{id}/students', [AttendanceController::class, 'sessionStudents']);
+    Route::post('attendance-sessions/{id}/record', [AttendanceController::class, 'record']);
 
     Route::get('registrations/{id}/grades', [GradeController::class, 'show']);
     Route::post('registrations/{id}/grades', [GradeController::class, 'store']);
