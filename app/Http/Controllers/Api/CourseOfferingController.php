@@ -8,6 +8,7 @@ use App\Http\Resources\CourseOfferingResource;
 use App\Http\Resources\CourseOfferingStudentResource;
 use App\Http\Resources\StudentCourseRegistrationResource;
 use App\Models\CourseOffering;
+use App\Services\GradeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -128,5 +129,17 @@ class CourseOfferingController extends ApiController
             ->paginate($request->integer('per_page', 15));
 
         return $this->successResponse(CourseOfferingResource::collection($offerings)->response($request)->getData(true));
+    }
+
+    public function gradeSheet(int $id, GradeService $service): JsonResponse
+    {
+        $includeInactive = filter_var(request()->query('include_inactive', false), FILTER_VALIDATE_BOOLEAN);
+
+        return $this->successResponse($service->getGradeSheet($id, $includeInactive));
+    }
+
+    public function resultsSummary(int $id, GradeService $service): JsonResponse
+    {
+        return $this->successResponse($service->getResultsSummary($id));
     }
 }

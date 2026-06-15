@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\GradeAppealController;
 use App\Http\Controllers\Api\GradeApprovalController;
 use App\Http\Controllers\Api\GradeAuditLogController;
 use App\Http\Controllers\Api\GradeComponentController;
+use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\GradingPolicyController;
 use App\Http\Controllers\Api\LibraryAuthorController;
 use App\Http\Controllers\Api\LibraryBookController;
@@ -137,6 +138,8 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('students/{student}/documents', [StudentController::class, 'documents']);
     Route::get('students/{student}/registrations', [StudentController::class, 'registrations']);
     Route::get('students/{student}/transcript', [StudentController::class, 'transcript']);
+    Route::get('students/{student}/gpa', [StudentController::class, 'gpa']);
+    Route::get('students/{student}/cgpa', [StudentController::class, 'cgpa']);
 
     Route::get('colleges/{college}/departments', [CollegeController::class, 'departments']);
     Route::get('departments/{department}/programs', [DepartmentController::class, 'programs']);
@@ -156,7 +159,14 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function (): void {
     Route::get('course-offerings/{id}/students', [CourseOfferingController::class, 'students']);
     Route::get('course-offerings/{id}/capacity', [CourseOfferingController::class, 'capacity']);
     Route::get('course-offerings/by-semester', [CourseOfferingController::class, 'bySemester']);
+    Route::get('course-offerings/{id}/grade-sheet', [CourseOfferingController::class, 'gradeSheet']);
+    Route::get('course-offerings/{id}/results-summary', [CourseOfferingController::class, 'resultsSummary']);
     Route::get('course-offerings/by-program/{program_id}', [CourseOfferingController::class, 'byProgram']);
+
+    Route::get('registrations/{id}/grades', [GradeController::class, 'show']);
+    Route::post('registrations/{id}/grades', [GradeController::class, 'store']);
+    Route::put('registrations/{id}/grades', [GradeController::class, 'update']);
+    Route::post('registrations/{id}/calculate-result', [GradeController::class, 'calculateResult']);
 
     Route::post('registrations/register-student', [RegistrationController::class, 'registerStudent']);
     Route::post('registrations/{id}/drop', [RegistrationController::class, 'drop']);

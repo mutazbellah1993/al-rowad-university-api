@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\GradeException;
 use App\Exceptions\RegistrationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -33,6 +34,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'Validation failed',
                 'errors' => $exception->errors(),
             ], 422);
+        });
+
+        $exceptions->render(function (GradeException $exception, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'errors' => $exception->errors,
+            ], $exception->status);
         });
 
         $exceptions->render(function (RegistrationException $exception, Request $request) {

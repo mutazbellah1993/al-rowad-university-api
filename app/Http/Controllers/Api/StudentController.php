@@ -13,6 +13,7 @@ use App\Http\Resources\StudentResource;
 use App\Http\Resources\StudentRegistrationSummaryResource;
 use App\Http\Resources\StudentTranscriptResource;
 use App\Models\Student;
+use App\Services\GradeService;
 use App\Services\RegistrationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -117,22 +118,30 @@ class StudentController extends ApiController
         );
     }
 
-    public function transcript(Student $student): JsonResponse
+    public function transcript(Student $student, GradeService $gradeService): JsonResponse
     {
-        $student->load([
-            'studentCourseRegistrations' => function ($query): void {
-                $query->with([
-                    'courseOffering.course',
-                    'courseOffering.academicYear',
-                    'courseOffering.semester',
-                    'studentCourseResult.resultStatus',
-                ])->orderBy('student_course_registration_id');
-            },
+        return $this->successResponse($gradeService->getTranscript($student));
+    }
+
+    public function gpa(Student $student, Request $request, GradeService $gradeService): JsonResponse
+    {
+        $validated = $request->validate([
+            'academic_year_id' => ['required', 'integer', 'exists:academic_years,academic_year_id'],
+            'semester_id' => ['required', 'integer', 'exists:semesters,semester_id'],
         ]);
 
         return $this->successResponse(
-            (new StudentTranscriptResource($student))->resolve(request())
+            $gradeService->calculateGpa(
+                $student,
+                (int) $validated['academic_year_id'],
+                (int) $validated['semester_id']
+            )
         );
+    }
+
+    public function cgpa(Student $student, GradeService $gradeService): JsonResponse
+    {
+        return $this->successResponse($gradeService->calculateCgpa($student));
     }
 
     public function availableCourses(Student $student, Request $request, RegistrationService $service): JsonResponse
