@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
-import AnimatedBackground from '../../components/login/AnimatedBackground'
-import FloatingIcons from '../../components/login/FloatingIcons'
-import LoginCard from '../../components/login/LoginCard'
+import AnimatedBackground from './AnimatedBackground'
+import FloatingIcons from './FloatingIcons'
+import LoginCard from './LoginCard'
 import './LoginPage.css'
 
 export default function LoginPage() {
@@ -18,7 +18,7 @@ export default function LoginPage() {
     <div className="login-page" onMouseMove={handleMouseMove}>
       <AnimatedBackground mousePos={mousePos} />
       <FloatingIcons mousePos={mousePos} />
-      <div className="login-center">
+<div className="login-center">
         <LoginCard />
       </div>
     </div>
