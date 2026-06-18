@@ -1,10 +1,10 @@
 info:
-  name: تعديل
+  name: Untitled
   type: http
   seq: 1
 
 http:
-  method: PUT
+  method: GET
   url: ""
   auth: inherit
 
